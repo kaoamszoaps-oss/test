@@ -3,6 +3,7 @@
 SDC-Net Docker镜像，可提供用于训练与测试SDC-Net模型的完整环境。
 
 - 项目主要路径组织如下：
+```
 app/
 ├── 📂 configs
 │   ├── 📂 _base_
@@ -25,7 +26,7 @@ app/
     ├── 📄 train.py                        # 训练脚本
     ├── 📄 test.py                         # 测试脚本
     └── 📄 inference.py                    # 推理脚本
-
+```
 # SDC-Net Docker镜像使用说明
 下面教程将基于已获得的SDC-Net docker镜像，说明如何规范化地使用SDC-Net模型及相关环境，包括镜像加载、container启动、VS Code连接配置，以及常见问题的解决。
 
