@@ -1,12 +1,33 @@
-[README-20260130-V03-SXP.md](https://github.com/user-attachments/files/24953334/README-20260130-V03-SXP.md)
+# SDC-Net Docker镜像版本说明
+本模块记录 SDC-Net Docker 镜像的维护历史与版本迭代详情。
+`SDC-Net:20260130-V05-SXP` 版由孙晓鹏于2026/01/30封装。且在封装后，进行了跨设备测试实验。
+
+### 2026.01.30: SDC-Net V05 (当前版本)
+* **维护人**: 孙晓鹏
+* **镜像标签**: `sdc-net:20260130-V05-SXP`
+
+**更新特性 (Features):**
+* **跨设备迁移**：进行了跨设备测试实验
+
+### 2026.01.29: SDC-Net V04
+* **维护人**: 孙晓鹏
+* **镜像标签**: `sdc-net:20260129-V05-SXP`
+
+**更新特性 (Features):**
+* **环境构建**: 完成 PyTorch + MMSegmentation 基础环境的封装与测试。
+* **全流程跑通**: 验证了单卡/多卡训练 (`dist_train`)、测试 (`test`) 及推理 (`inference`) 脚本的可用性。
+
+
+---
+
 # SDC-Net Docker镜像结构说明
 SDC-Net Docker镜像，可提供用于训练与测试SDC-Net模型的完整环境。
 
 - 项目主要路径组织如下：
 ```
 app/
-├── 📂 configs
-│   ├── 📂 _base_
+├── 📂 configs/
+│   ├── 📂 _base_/
 │   │   ├── 📂 models/
 │   │   │   └── 📄 isdnet_r50-d8.py        # 模型基座：继承自 ISDNet
 │   │   ├── 📂 datasets/
@@ -27,8 +48,9 @@ app/
     ├── 📄 test.py                         # 测试脚本
     └── 📄 inference.py                    # 推理脚本
 ```
+
 # SDC-Net Docker镜像使用说明
-下面教程将基于已获得的SDC-Net docker镜像，说明如何规范化地使用SDC-Net模型及相关环境，包括镜像加载、container启动、VS Code连接配置，以及常见问题的解决。
+下面教程将基于已获得的SDC-Net docker镜像，说明如何规范化地使用SDC-Net模型及相关环境，包括镜像加载，container启动，基于命令行、VS Code的连接访问，以及常见问题的解决。
 
 ## 📋 前置要求
 
@@ -51,7 +73,6 @@ app/
 docker load -i sdcnet.tar
 # 查看当前所有镜像，验证镜像是否加载成功
 docker images
-
 ```
 
 ### 2. 启动容器命令说明 (标准指令)
@@ -65,7 +86,6 @@ docker run -itd \
     -v /home_nfs/dataset \
     -v $(pwd)/work_dirs:/app/work_dirs \
     sdc-net:latest /bin/bash
-
 ```
 
 该指令已包含显卡调用、内存优化和数据挂载配置。由于采用了数据卷，可以确保训练稳定性和数据安全。
@@ -81,22 +101,26 @@ docker run -itd \
 
 ### 3. 路径映射规划及容器启动命令
 
-SDC-Net docker内路径和宿主机路径对应关系可规划为下表所示。
+- SDC-Net docker内路径和宿主机路径对应关系可规划为下表所示。
 
-| 序号 | Docker路径 | Host路径 | 说明 |
+| 序号 | Docker内部路径 | Host外部路径 | 说明 |
 |:---:|:---|:---|:---|
-| 1 | `**RESNET18_MODEL**` | `/home_nfs/xiaopeng.sun/project/medical_seg/SDC-Net/model` | Resnet18预训练模型存放地址【训练模型时使用】 |
-| 2 | `/SDC-Net_use/work_dirs` | `/home_nfs/xiaopeng.sun/project/medical_seg/SDC-Net/work_dirs` | 训练模型时训练好的模型存放路径 |
-| 3 | `/home_nfs/jiaoli.liu/ISDNet/data/IDRID` | `/home_nfs/group.img.op/dataset/data-jiaoli/IDRID/` | IDRID数据集存放路径 |
-| 4 | `/home_nfs/jiaoli.liu/ISDNet/data/FGADR` | `/home_nfs/group.img.op/dataset/data-jiaoli/FGADR/` | FGADR数据集存放路径 |
-| 5 | `/home_nfs/jiaoli.liu/ISDNet/data/DDR` | `/home_nfs/group.img.op/dataset/data-jiaoli/DDR/` | DDR数据集存放路径 |
-| 6 | `/SDC-Net_use/model/latest.pth` | `/home_nfs/xiaopeng.sun/project/medical_seg/SDC-Net/model` | SDC-Net预训练模型存放路径 |
-| 7 | `/SDC-Net_use/input_img/test.jpg` |`/home_nfs/xiaopeng.sun/project/medical_seg/SDC-Net/input_img` | 推理图片输入路径 |
-| 8 | `/SDC-Net_use/output_img` | `/home_nfs/xiaopeng.sun/project/medical_seg/SDC-Net/output_img` | 推理图片输出路径 |
+| 1 | `/SDC-Net_use/model/` | `*HOST_WORK*/SDC-Net/model/` | 预训练模型存放路径 |
+| 2 | `/SDC-Net_use/work_dirs/` | `*HOST_WORK*/SDC-Net/work_dirs/` | 训练好的模型存放路径 |
+| 3 | `/SDC-Net_use/input_img/` |`*HOST_WORK*/SDC-Net/input_img/` | 推理图片输入路径 |
+| 4 | `/SDC-Net_use/output_img/` | `*HOST_WORK*/SDC-Net/output_img/` | 推理图片输出路径 |
+| 5 | `/home_nfs/jiaoli.liu/ISDNet/data/IDRID/` | `*HOST_DATA*/IDRID/` | IDRID数据集存放路径 |
+| 6 | `/home_nfs/jiaoli.liu/ISDNet/data/FGADR/` | `*HOST_DATA*/FGADR/` | FGADR数据集存放路径 |
+| 7 | `/home_nfs/jiaoli.liu/ISDNet/data/DDR/` | `*HOST_DATA*/DDR/` | DDR数据集存放路径 |
 
-*注：`**RESNET18_MODEL**` 表示 `/SDC-Net_use/model/resnet18_8xb32_in1k_20210831-fbbb1da6.pth`*
+*注：*  
+`*HOST_WORK*` 表示 `/home_nfs/xiaopeng.sun/project/medical_seg`  
+`*HOST_DATA*` 表示 `/home_nfs/group.img.op/dataset/data-jiaoli`  
+`/SDC-Net_use/model/` 中可放置 `resnet18_8xb32_in1k_20210831-fbbb1da6.pth`、`latest.pth`等预训练模型
 
-- 基于以上目录映射关系，完整的启动container的样例命令如下：
+- 基于以上目录映射关系，在宿主机中，预先组织好`model`、`work_dirs`、`input_img`、`output_img`，以及数据集路径。
+
+- 运行以下样例命令，即可启动container。
 
 ```bash
 docker run -it \      
@@ -104,10 +128,51 @@ docker run -it \
     --shm-size 8g \
     -v /home_nfs/group.img.op/dataset/data-jiaoli:/home_nfs/jiaoli.liu/ISDNet/data
     -v /home_nfs/xiaopeng.sun/project/medical_seg/SDC-Net:/SDC-Net_use \
-    sdc-net:latest /bin/bash
+    sdc-net:v3.0 /bin/bash
 ```
 
-- 从上面的项目代码中指定的各路径，我们在外部挂载时，只需要指定两个路径【数据集+其他】，:前的路径就是你本地挂载的路径，`/home_nfs/group.img.op/dataset/data-jiaoli/IDRID/` 存放数据集，`/home_nfs/xiaopeng.sun/project/medical_seg/SDC-Net`应该像项目文件指定一样，组织几个文件夹：`model`、`work_dirs`、`input_img`、`output_img`
+---
+## 💻 基于命令行的Docker访问
+
+1. 进入容器环境
+* run命令正常启动容器
+
+2. 训练模型 (Train)
+支持单卡训练与多卡分布式训练。
+
+- 单卡训练：
+
+```bash
+# 语法：python tools/train.py <配置文件路径>
+python tools/train.py configs/sdcnet/sdcnetplus_r18-d8_512x512_40k_IDRiD.py
+```
+
+- 多卡分布式训练 (推荐)： 例如使用 2 张显卡 (GPU 0,1) 进行加速训练：
+
+```bash
+# 语法：bash tools/dist_train.sh <配置文件> <GPU数量>
+CUDA_VISIBLE_DEVICES=0,1 bash tools/dist_train.sh configs/sdcnet/sdcnetplus_r18-d8_512x512_40k_IDRiD.py 2
+```
+3. 测试模型 (Test)
+加载训练好的权重文件（.pth），评估模型精度（如 mIoU）。
+
+```bash
+# 语法：python tools/test.py <配置文件> <权重文件> --eval <指标>
+python tools/test.py configs/sdcnet/sdcnetplus_r18-d8_512x512_40k_IDRiD.py \
+    /SDC-Net_use/work_dirs/latest.pth \
+    --eval mIoU
+```
+4. 模型推理 (Inference)
+读取输入路径的图片，生成掩码图并保存到输出路径。
+
+```bash
+# 示例命令 (请根据 tools/inference.py 的实际参数调整)
+python tools/inference.py \
+    --config configs/sdcnet/sdcnetplus_r18-d8_512x512_40k_IDRiD.py \
+    --checkpoint /SDC-Net_use/model/latest.pth \
+    --img-dir /SDC-Net_use/input_img \
+    --out-dir /SDC-Net_use/output_img
+```
 
 ---
 
@@ -119,7 +184,7 @@ docker run -it \
 2. **连接容器**：
 * 按 `F1` 或 `Ctrl+Shift+P` 打开命令面板。
 * 输入并选择：`Dev Containers: Attach to Running Container`。
-* 在列表中选择刚才启动的容器 `nnunet`。
+* 在列表中选择刚才启动的容器 `sdc-net v3.0`。
 
 
 3. **打开项目**：
